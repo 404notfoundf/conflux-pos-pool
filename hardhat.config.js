@@ -59,7 +59,7 @@ task("transferPHX", "Transfer PHX to address")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-    solidity: "0.8.18",
+    solidity: "0.8.20",
     networks: {
         hardhat: {
             allowUnlimitedContractSize: true,
@@ -117,9 +117,8 @@ module.exports = {
         pretty: true,
         // format: "minimal",
     },
-    namedAccounts: {
-        deployer: {
-            default: 0, // here this will by default take the first account as deployer
-        },
+    gasReporter: {
+        enabled: process.env.REPORT_GAS !== undefined,
+        currency: "USD",
     },
 };
