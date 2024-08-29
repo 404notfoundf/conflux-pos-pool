@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 import {ParamsControl} from "@confluxfans/contracts/InternalContracts/ParamsControl.sol";
 
 interface IVotingEscrow {
@@ -13,10 +13,10 @@ interface IVotingEscrow {
     function createLock(uint256 amount, uint256 unlockBlock) external;
     function increaseLock(uint256 amount) external;
     function extendLockTime(uint256 unlockBlock) external;
-    
+
     function userLockInfo(address user) external view returns (LockInfo memory);
     function userLockInfo(address user, uint256 blockNumber) external view returns (LockInfo memory);
-    
+
     function userVotePower(address user) external view returns (uint256);
     function userVotePower(address user, uint256 blockNumber) external view returns (uint256);
 

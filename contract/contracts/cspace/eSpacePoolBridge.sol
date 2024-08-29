@@ -1,11 +1,11 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ParamsControl} from "@confluxfans/contracts/InternalContracts/ParamsControl.sol";
-import {CrossSpaceCall} from "./interfaces/ICrossSpaceCall.sol";
-import {IPoSPool} from "./interfaces/IPoSPool.sol";
-import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
+import {CrossSpaceCall} from "../interfaces/ICrossSpaceCall.sol";
+import {IPoSPool} from "../interfaces/IPoSPool.sol";
+import {IVotingEscrow} from "../interfaces/IVotingEscrow.sol";
 
 // eSpace pool bridge contract
 contract CoreBridge is Ownable {
@@ -62,7 +62,7 @@ contract CoreBridge is Ownable {
 
   function queryInterest() public view returns (uint256) {
     IPoSPool posPool = IPoSPool(poolAddress);
-    return posPool.userInterest(address(this));
+    return posPool.getUserReward(address(this));
   }
 
   function queryUserSummary() public view returns (IPoSPool.UserSummary memory) {
@@ -73,7 +73,7 @@ contract CoreBridge is Ownable {
 
   function syncAPYandClaimInterest() public onlyOwner {
     syncAPY();
-    claimInterest();
+    claimReward();
   }
 
   function syncAPY() public {
@@ -94,21 +94,21 @@ contract CoreBridge is Ownable {
     }
   }
 
-  function claimInterest() public onlyOwner {
+  function claimReward() public onlyOwner {
     IPoSPool posPool = IPoSPool(poolAddress);
-    uint256 interest = posPool.userInterest(address(this));
-    if (interest > 0) {
-      posPool.claimInterest(interest);
-      crossSpaceCall.transferEVM{value: interest}(ePoolAddrB20());
+    uint256 reward = posPool.getUserReward(address(this));
+    if (reward > 0) {
+      posPool.claimReward(reward);
+      crossSpaceCall.transferEVM{value: reward}(ePoolAddrB20());
     }
   }
 
-  function claimAndCrossInterest() public onlyOwner {
+  function claimAndCrossReward() public onlyOwner {
     IPoSPool posPool = IPoSPool(poolAddress);
-    uint256 interest = posPool.userInterest(address(this));
-    if (interest > 0) {
-      posPool.claimInterest(interest);
-      crossSpaceCall.callEVM{value: interest}(ePoolAddrB20(), abi.encodeWithSignature("receiveInterest()"));
+    uint256 reward = posPool.getUserReward(address(this));
+    if (reward > 0) {
+      posPool.claimReward(reward);
+      crossSpaceCall.callEVM{value: reward}(ePoolAddrB20(), abi.encodeWithSignature("receiveInterest()"));
     }
   }
 
@@ -175,29 +175,24 @@ contract CoreBridge is Ownable {
     crossSpaceCall.callEVM(ePoolAddrB20(), abi.encodeWithSignature("handleUnstakeTask()"));
   }
 
-  // =================== voting escrow related methods =================== 
+  // =================== voting escrow related methods ===================
 
   function _ePoolVotingAddrB20() internal view returns (bytes20) {
     return bytes20(eSpaceVotingEscrow);
   }
 
   function eSpaceVotingLastUnlockBlock() public view returns (uint256) {
-    bytes memory num =
-        CROSS_SPACE_CALL.staticCallEVM(_ePoolVotingAddrB20(), abi.encodeWithSignature("lastUnlockBlock()"));
+    bytes memory num = CROSS_SPACE_CALL.staticCallEVM(_ePoolVotingAddrB20(), abi.encodeWithSignature("lastUnlockBlock()"));
     return abi.decode(num, (uint256));
   }
 
   function eSpaceVotingGlobalLockAmount(uint256 lockBlock) public view returns (uint256) {
-    bytes memory num = CROSS_SPACE_CALL.staticCallEVM(
-        _ePoolVotingAddrB20(), abi.encodeWithSignature("globalLockAmount(uint256)", lockBlock)
-    );
+    bytes memory num = CROSS_SPACE_CALL.staticCallEVM(_ePoolVotingAddrB20(), abi.encodeWithSignature("globalLockAmount(uint256)", lockBlock));
     return abi.decode(num, (uint256));
   }
 
   function eSpaceVotingPoolVoteInfo(uint64 round, uint16 topic) public view returns (uint256[3] memory) {
-    bytes memory votes = CROSS_SPACE_CALL.staticCallEVM(
-        _ePoolVotingAddrB20(), abi.encodeWithSignature("getPoolVoteInfo(uint64,uint16)", round, topic)
-    );
+    bytes memory votes = CROSS_SPACE_CALL.staticCallEVM(_ePoolVotingAddrB20(), abi.encodeWithSignature("getPoolVoteInfo(uint64,uint16)", round, topic));
     return abi.decode(votes, (uint256[3]));
   }
 

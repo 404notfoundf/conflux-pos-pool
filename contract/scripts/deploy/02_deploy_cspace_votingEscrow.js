@@ -11,17 +11,16 @@ async function main() {
         from: deployer.address,
     }).executed();
     const votingEscrowImplAddr = votingEscrowDeployReceipt.contractCreated;
+    console.log("=== voting escrow impl address === : ", votingEscrowImplAddr);
 
-    const PoSPoolProxy = await conflux.getContractFactory('Proxy1967');
+    const PoSPoolProxy = await conflux.getContractFactory('PoSPoolProxy1967');
     const proxyDeployReceipt = await PoSPoolProxy.constructor(votingEscrowImplAddr, InitializeMethodData).sendTransaction({
         from: deployer.address,
     }).executed();
-    logReceipt(proxyDeployReceipt, 'VotingEscrow deployment');
-    
-    const votingEscrowAddress = proxyDeployReceipt.contractCreated;
-    console.log('VotingEscrow address: ', votingEscrowAddress);
+    const votingEscrowProxyAddr = proxyDeployReceipt.contractCreated;
+    console.log('VotingEscrow address: ', votingEscrowProxyAddr);
 
-    const votingEscrow = await conflux.getContractAt('VotingEscrow', votingEscrowAddress);
+    const votingEscrow = await conflux.getContractAt('VotingEscrow', votingEscrowProxyAddr);
 
     const setPoSPoolReceipt = await votingEscrow.setPosPool(process.env.POOL_ADDRESS).sendTransaction({
         from: deployer.address,
@@ -30,7 +29,7 @@ async function main() {
 
     // set posPool
     const posPool = await conflux.getContractAt('PoSPool', process.env.POOL_ADDRESS);
-    const setVotingEscrowReceipt = await posPool.setVotingEscrow(votingEscrowAddress).sendTransaction({
+    const setVotingEscrowReceipt = await posPool.setVotingEscrow(votingEscrowProxyAddr).sendTransaction({
         from: deployer.address,
     }).executed();
     logReceipt(setVotingEscrowReceipt, 'PoSPool.setVotingEscrow');

@@ -28,20 +28,20 @@ const sendTxMeta = {
 //   gasPrice: Drip.fromGDrip(300),
 };
 
-async function syncAPYandClaimInterest() {
+async function syncApyAndClaimReward() {
   setInterval(async () => {
     // check and alert
     await checkBalance();
 
-    let interest = await coreBridge.queryInterest();
-    debug('syncAPYandClaimInterest: ', interest);
-    if (interest === 0n) return;
+    let reward = await coreBridge.queryInterest();
+    debug('syncApyAndClaimReward: ', interest);
+    if (reward === 0n) return;
     const receipt = await coreBridge
       .syncAPYandClaimInterest()
       .sendTransaction(sendTxMeta)
       .executed();
 
-    debug(`syncAPYandClaimInterest finished: `, receipt.transactionHash, receipt.outcomeStatus);
+    debug(`syncApyAndClaimReward finished: `, receipt.transactionHash, receipt.outcomeStatus);
   }, 1000 * 60 * 30);  // 30 minutes once
 }
 
@@ -98,6 +98,7 @@ async function syncPosVoteStatus() {
   }, 1000 * 60 * 5);
 }
 
+
 async function checkBalance() {
   let balance = await conflux.cfx.getBalance(account.address);
   let oneCfx = Drip.fromCFX(1);
@@ -106,14 +107,16 @@ async function checkBalance() {
   }
 }
 
+
 async function main() {
   try {
-    syncAPYandClaimInterest();
+    syncApyAndClaimReward();
     syncPosVoteStatus();
     console.log('==== eSpacePool Crossing Tasks Started ====');
   } catch (e) {
     console.log(e);
   }
 }
+
 
 main().catch(console.log);

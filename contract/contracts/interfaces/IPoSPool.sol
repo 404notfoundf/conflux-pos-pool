@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 import {ParamsControl} from "@confluxfans/contracts/InternalContracts/ParamsControl.sol";
 import {VotePowerQueue} from "../utils/VotePowerQueue.sol";
@@ -34,7 +34,7 @@ interface IPoSPool {
   }
 
   // admin functions
-  function register(bytes32 indentifier, uint64 votePower, bytes calldata blsPubKey, bytes calldata vrfPubKey, bytes[2] calldata blsPubKeyProof) external payable;
+  function register(bytes32 identifier, uint64 votePower, bytes calldata blsPubKey, bytes calldata vrfPubKey, bytes[2] calldata blsPubKeyProof) external payable;
   function setPoolUserShareRatio(uint32 ratio) external;
   function setLockPeriod(uint64 period) external;
   function setPoolName(string memory name) external;
@@ -52,9 +52,9 @@ interface IPoSPool {
   function increaseStake(uint64 votePower) external payable;
   function decreaseStake(uint64 votePower) external;
   function withdrawStake(uint64 votePower) external;
-  function userInterest(address _address) external view returns (uint256);
-  function claimInterest(uint256 amount) external;
-  function claimAllInterest() external;
+  function getUserReward(address _address) external view returns (uint256);
+  function claimReward(uint256 amount) external;
+  function claimAllReward() external;
   function userSummary(address _user) external view returns (UserSummary memory);
   function posAddress() external view returns (bytes32);
   function userInQueue(address account) external view returns (VotePowerQueue.QueueNode[] memory);

@@ -6,10 +6,9 @@ require("solidity-coverage");
 require("hardhat-conflux");
 require("dotenv").config();
 const { task } = require("hardhat/config");
-// require("hardhat-contract-sizer");
-const { loadPrivateKey } = require('./utils');
+const { loadPrivateKey, loadESpacePrivateKey} = require('./utils');
 const PRIVATE_KEY = loadPrivateKey();
-
+const ESPACE_PRIVATE_KEY = loadESpacePrivateKey();
 
 task("upgradeContract", "Upgrade a Proxy1967 Contract, assumes the implementation contract has no constructor parameters")
     .addParam("address", "The address of the proxy contract")
@@ -72,43 +71,40 @@ task("upgradeToNewImpl", "Upgrade a Proxy1967 Contract to new implementation, as
         console.log(`Upgrade ${address} to new impl success`);
     });
 
-task("taskName", "Task description", async () => {
-
-});
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  * Go to https://hardhat.org/config/ to learn more
  */
 module.exports = {
-  solidity: "0.8.4",
-  defaultNetwork: "espaceTestnet",
+  solidity: "0.8.20",
+  defaultNetwork: "espace_testnet",
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
-    cfxMainnet: {
+    cfx: {
         url: "https://main.confluxrpc.com",
         accounts: [
           PRIVATE_KEY,
         ],
         chainId: 1029,
     },
-    cfxTestnet: {
+    cfx_testnet: {
       url: "https://test.confluxrpc.com",
       accounts: [
         PRIVATE_KEY,
       ],
       chainId: 1,
     },
-    espaceMainnet: {
+    espace: {
       url: "https://evm.confluxrpc.com",
-      accounts: [PRIVATE_KEY],
+      accounts: [ESPACE_PRIVATE_KEY],
       chainId: 1030,
     },
-    espaceTestnet: {
+    espace_testnet: {
       url: "https://evmtestnet.confluxrpc.com",
-      accounts: [PRIVATE_KEY],
+      accounts: [ESPACE_PRIVATE_KEY],
       chainId: 71,
     },
     net8888: {

@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "@confluxfans/contracts": "^0.3.3",
-    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/contracts-upgradeable": "^4.8.3",
     "commander": "^8.3.0",
     "debug": "^4.3.4",
     "ding-robot": "^1.0.0",

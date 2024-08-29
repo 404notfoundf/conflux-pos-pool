@@ -46,4 +46,4 @@ So it is necessary to have some way monitor your PoS node's status.
 
 ## ForceRetired
 
-If your Pool PoS Node is force retired you need manually [do some operation](./PoolForceRetired.md) to correct the Pool's vote state.
+If your Pool PoS Node is force retired you need manually [do some operation](PoolForceRetired.md) to correct the Pool's vote state.
