@@ -48,13 +48,13 @@ async function syncApyAndClaimReward() {
 async function syncPosVoteStatus() {
   setInterval(async () => {
     try {
-      let crossingVotes = await coreBridge.queryCrossingVotes();
-      debug('crossStake: ', crossingVotes);
-      if (crossingVotes > 0) {
-        const receipt = await coreBridge
-          .crossStake()
-          .sendTransaction(sendTxMeta)
-          .executed();
+        let crossingVotes = await coreBridge.queryCrossingVotes();
+        debug('crossStake: ', crossingVotes);
+        if (crossingVotes > 0) {
+          const receipt = await coreBridge
+              .crossStake()
+              .sendTransaction(sendTxMeta)
+              .executed();
         debug(`crossStake finished: `, receipt.transactionHash, receipt.outcomeStatus);
       }
     } catch (e) {

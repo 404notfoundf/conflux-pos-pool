@@ -14,7 +14,7 @@ const oracle = cfxInstance.Contract({
     address: process.env.POS_ORACLE
 });
 
-// posAddress即validator的地址， powAddress地址即Core Space合约地址
+// posAddress即validator的地址, powAddress地址即core Space合约地址
 async function main() {
     setInterval(async function () {
         await updatePosRewardInfo();
@@ -27,7 +27,7 @@ async function main() {
     console.log("=== start pos oracle service ===");
 }
 
-async function updatePosRewardInfo(epoch){
+async function updatePosRewardInfo(epoch) {
     try {
         if (!epoch) {
             const status = await cfxInstance.pos.getStatus();
@@ -38,7 +38,7 @@ async function updatePosRewardInfo(epoch){
 
         const rewardInfo = await cfxInstance.pos.getRewardsByEpoch(epoch);
         if (!rewardInfo || !rewardInfo.accountRewards) return;
-        const { accountRewards } = rewardInfo;
+        const {accountRewards} = rewardInfo;
 
         console.log("account reward info : ", accountRewards)
 
@@ -63,6 +63,7 @@ async function updatePosRewardInfo(epoch){
                 from: cfxAccount.address,
             })
             .executed();
+
         console.log(new Date(), "success updatePosRewardInfo, tx hash is : ", receipt.transactionHash); // log record update reward info
     } catch (e) {
         console.error(new Date(), "fail updatePosRewardInfo , error is : ", e);

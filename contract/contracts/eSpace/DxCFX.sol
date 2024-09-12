@@ -2947,7 +2947,6 @@ contract DxCFX is ERC20PresetMinterPauserUpgradeable {
         emit Deposit(msg.sender, depositAmount, shares);
     }
 
-
     function redeem(uint256 shares) public {
         require(shares > 0, "redeem amount must be greater than 0");
 
@@ -3028,7 +3027,7 @@ contract DxCFX is ERC20PresetMinterPauserUpgradeable {
     }
 
     /////////// functions for core bridge to call ///////////
-       modifier onlyBridge() {
+    modifier onlyBridge() {
         require(msg.sender == coreBridge, "Only bridge is allowed");
         _;
     }

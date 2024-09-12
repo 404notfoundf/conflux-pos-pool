@@ -17,7 +17,7 @@
    ```
    
    4. 将部署后的合约地址填入 env 文件中 POOL_ADDRESS 字段  
-   
+
    5. 部署 VotingEscrow 合约
    ```shell
       npx hardhat run scripts/core/02_deploy_votingEscrow.js --network cfx_testnet
@@ -32,14 +32,14 @@
 ```shell
    npx hardhat run scripts/core/03_deploy_posOracle.js --network cfx_testnet
 ```
- 将部署后的合约地址填入 env 文件中 POS_ORACLE
+   将部署后的合约地址填入 env 文件中 POS_ORACLE
 
  与此同时, 我们需要开启相应的服务来更新PoSOracle合约
  - 开启对应服务，更新PoSOracle合约
    ```shell
       node service/seedPosOracle.js
    ```
-
+   
 3. 部署 CoreBridge 合约
 ```shell
    npx hardhat run scripts/core/04_deploy_dxCFXBridge.js --network cfx_testnet
@@ -58,7 +58,7 @@
 ```
 (注: 主网部署需要将配置文件相关部分替换成主网，同时部署命令中的cfx_testnet 替换成 cfx, espace_testnet 替换成 espace)
 
-6. 开启与 CFX 小额质押有关的函数
+6. 开启与 CFX 小额质押 有关的函数
 ```shell
    node service/handleCFXCrossTask.js
 ```

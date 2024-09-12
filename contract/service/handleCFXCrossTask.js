@@ -39,10 +39,11 @@ async function handleCrossSpaceTask() {
         const receipt = await dxCfxBridge.transferFromEspace().sendTransaction({
             from: cfxAccount.address,
         }).executed();
+
         logReceipt(receipt, "cross cfx from eSpace to core space");
     }
 
-    // 2. 查看在此期间有多少收益，领取，发送到eSpace
+    // 2. 查看在此期间有多少收益, 领取, 发送到eSpace
     const reward = await dxCfxBridge.poolReward();
     console.log("reward : ", reward);
 
@@ -50,6 +51,7 @@ async function handleCrossSpaceTask() {
         const receipt = await dxCfxBridge.claimReward().sendTransaction({
             from: cfxAccount.address,
         }).executed();
+
         logReceipt(receipt, "claim reward");
     }
 
@@ -58,15 +60,15 @@ async function handleCrossSpaceTask() {
     console.log("redeemLen : ", redeemLen);
 
     /*
-        如果有需要redeem的, 处理流程如下:
-        1. 查看是否有unlocked, 有直接withdraw
+        如果需要 redeem , 处理流程如下:
+        1. 查看是否有unlocked, 直接withdraw
         2. 查看是否有unlocking(在解锁中的)
-        3. 查看是否需要从正在stake的中退出, 以及计算应该退多少
+        3. 查看是否需要从正在stake中的退出, 以及计算应该退多少
     */
     if (redeemLen > 0) {
 
         let summary = await dxCfxBridge.poolSummary();
-        // 查看是否有 , 有直接处理
+        // 查看是否有, 直接处理
         if (summary.unlounlockedcked > 0) {
             await _handleRedeem();
             summary = await dxCfxBridge.poolSummary();
@@ -89,11 +91,13 @@ async function handleCrossSpaceTask() {
         }
 
     } else {
+
         let summary = await dxCfxBridge.poolSummary();
         if (summary.unlocked > 0) {
             await _handleRedeem(); // withdraw
             summary = await dxCfxBridge.poolSummary();
         }
+
         let balance = await cfxInstance.cfx.getBalance(process.env.CORE_BRIDGE);
         let accReward = await dxCfxBridge.poolAccReward();
 
@@ -125,7 +129,6 @@ async function handleCrossSpaceTask() {
         }).executed();
         logReceipt(receipt, "stake votes");
     }
-
 }
 
 async function _handleRedeem() {
