@@ -59,7 +59,7 @@ abstract contract Proxy {
   }
 
   /**
-   * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
+   * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no standard
      * function in the contract matches the call data.
      */
   fallback() external payable virtual {
@@ -701,7 +701,7 @@ abstract contract Ownable is Context {
   }
 
   /**
-   * @dev Throws if called by any account other than the owner.
+   * @dev Throws if called by any account standard than the owner.
      */
   modifier onlyOwner() {
     require(owner() == _msgSender(), "Ownable: caller is not the owner");

@@ -275,22 +275,11 @@ contract PoSOracle is Ownable, IPoSOracle {
     PoSRegister constant POS_REGISTER = PoSRegister(0x0888000000000000000000000000000000000005);
 
     uint256 public posEpochHeight; // PoS epoch height
-    address private _operatorAddress;
     mapping(bytes32 => IPoSOracle.PoSAccountInfo) private _posAccountCurrentInfos; // posAccount => PoSAccountInfo
     mapping(uint256 => mapping(address => IPoSOracle.RewardInfo)) private _rewardInfos; // epochNumber => (powAccount => RewardInfo)
     mapping(uint256 => mapping(address => uint256)) private _userVoteInfos; // epochNumber => (powAccount => availableVotes)
 
-    // ======================== Modifiers =========================
-    modifier onlyOperator() {
-        require(msg.sender == _operatorAddress, "Only Operator Address is allowed");
-        _;
-    }
-
-
-    constructor(address operatorAddress) Ownable(msg.sender) {
-        _operatorAddress = operatorAddress;
-    }
-
+    constructor() Ownable(msg.sender) {}
     /**
      * @dev update account current, user vote info, pos epoch height
      * @param account pos address
@@ -315,7 +304,7 @@ contract PoSOracle is Ownable, IPoSOracle {
         bool forceRetired,
         IPoSOracle.VoteInfo[] memory inQueue,
         IPoSOracle.VoteInfo[] memory outQueue
-    ) public onlyOperator {
+    ) public onlyOwner {
         _posAccountCurrentInfos[account].availableVotes = availableVotes;
         _posAccountCurrentInfos[account].unlocked = unlocked;
         _posAccountCurrentInfos[account].locked = locked;
@@ -341,24 +330,20 @@ contract PoSOracle is Ownable, IPoSOracle {
         updatePoSEpochHeight(epochNumber);
     }
 
-    function updateUserVotes(uint256 epoch, address powAddr, uint256 availableVotes) public onlyOperator {
+    function updateUserVotes(uint256 epoch, address powAddr, uint256 availableVotes) public onlyOwner {
         _userVoteInfos[epoch][powAddr] = availableVotes;
         updatePoSEpochHeight(epoch);
     }
 
-    function updatePoSRewardInfo(uint256 epoch, address powAddress,  bytes32 posAddress, uint256 reward) public onlyOperator
+    function updatePoSRewardInfo(uint256 epoch, address powAddress,  bytes32 posAddress, uint256 reward) public onlyOwner
     {
         _rewardInfos[epoch][powAddress].posAddress = posAddress;
         _rewardInfos[epoch][powAddress].powAddress = powAddress;
         _rewardInfos[epoch][powAddress].reward = reward;
     }
 
-    function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public onlyOperator {
+    function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public onlyOwner {
         posEpochHeight = latestPoSEpochHeight;
-    }
-
-    function setOperatorAddress(address operatorAddress) public onlyOwner {
-        _operatorAddress = operatorAddress;
     }
 
     function getPoSAccountInfo(bytes32 posAddr) public view returns (IPoSOracle.PoSAccountInfo memory) {

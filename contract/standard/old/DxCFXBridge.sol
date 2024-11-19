@@ -742,6 +742,7 @@ contract SpaceBridge is Ownable {
 }
 
 // File: contracts/1.dxCfxBridge.sol
+// 0xc4d66de8000000000000000000000000124dea2a2ab7e5f93548774ce6d8822ea95eb81c
 pragma solidity ^0.8.20;
 
 contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
@@ -751,16 +752,26 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
     uint256 public poolShareRatio;
     uint256 public poolAccReward;  // accumulated pool handling fee
     uint256 public maxRedeemLenPerCall;
-    address private _operatorAddress;
+    address private operatorAddress;
 
-    // ======================== Modifiers =========================
-    modifier onlyOperator() {
-        require(msg.sender == _operatorAddress, "Only Operator Address is allowed");
-        _;
+    function getAddress() public view returns (address) {
+        return operatorAddress;
     }
 
-    function initialize(address operatorAddress) public initializer {
-        _operatorAddress = operatorAddress;
+//    function initialize() public initializer {
+//        aprPeriodCount = 48;
+//        poolShareRatio = 100_000_000; // 10% fee
+//        maxRedeemLenPerCall = 30;
+//    }
+
+    function initialize(address _operatorAddress) public initializer {
+        operatorAddress = _operatorAddress;
+        aprPeriodCount = 48;
+        poolShareRatio = 100_000_000; // 10% fee
+        maxRedeemLenPerCall = 30;
+    }
+
+    function initialize() public initializer {
         aprPeriodCount = 48;
         poolShareRatio = 100_000_000; // 10% fee
         maxRedeemLenPerCall = 30;
@@ -825,7 +836,7 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
         return apr;
     }
 
-    function claimReward() public onlyOperator {
+    function claimReward() public onlyOwner {
         uint256 reward = poolReward();
         if (reward == 0) return;
 
@@ -836,7 +847,7 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
         eSpaceAddStake(reward - poolShare);
     }
 
-    function stakeVotes() public onlyOperator {
+    function stakeVotes() public onlyOwner {
         uint256 stakeAmount = _balance();
 
         uint256 needRedeem = eSpacePoolTotalRedeemed();
@@ -853,13 +864,13 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
         posPoolInterface.increaseStake{value: vote * CFX_PER_VOTE}(uint64(vote));
     }
 
-    function unstakeVotes(uint64 votes) public onlyOperator {
+    function unstakeVotes(uint64 votes) public onlyOwner {
         IPoSPool.UserSummary memory poolSummary = poolSummary();
         require(poolSummary.locked >= votes, "DxCFXBridge: insufficient votes");
         posPoolInterface.decreaseStake(votes);
     }
 
-    function handleRedeem() public onlyOperator {
+    function handleRedeem() public onlyOwner {
         // withdraw unlocked votes
         IPoSPool.UserSummary memory poolSummary = poolSummary();
         if (poolSummary.unlocked > 0) {
@@ -895,7 +906,7 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
         posPoolInterface.decreaseStake(uint64(needUnstake));
     }
 
-    function handleFirstRedeem() public onlyOperator returns (bool) {
+    function handleFirstRedeem() public onlyOwner returns (bool) {
         uint256 firstRedeemAmount = eSpaceFirstRedeemAmount();
         if (_balance() < firstRedeemAmount) return false;
         eSpaceHandleRedeem(firstRedeemAmount);
@@ -906,16 +917,12 @@ contract DxCFXBridge is Ownable, Initializable, SpaceBridge {
         return eSpacePoolStakerNumber();
     }
 
-    function setOperatorAddress(address operatorAddress) public onlyOwner {
-        _operatorAddress = operatorAddress;
-    }
-
     /////////////// cross space call methods ///////////////
     function eSpaceAddStake(uint256 amount) public onlyOwner {
         CROSS_SPACE_CALL.callEVM(_ePoolAddrB20(), abi.encodeWithSignature("addStake(uint256)", amount));
     }
 
-    function eSpaceHandleRedeem(uint256 amount) public onlyOperator {
+    function eSpaceHandleRedeem(uint256 amount) public onlyOwner {
         CROSS_SPACE_CALL.callEVM{value: amount}(_ePoolAddrB20(), abi.encodeWithSignature("handleRedeem()"));
     }
 

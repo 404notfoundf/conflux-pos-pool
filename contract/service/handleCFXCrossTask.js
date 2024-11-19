@@ -23,8 +23,7 @@ async function main() {
         } catch (e) {
             console.error("handleCrossSpaceTask error: ", e);
         }
-    }, 1000 * 60 * 2);
-
+    }, 1000 * 60 * 10);
     console.log("=== start handle cross space task ===");
 }
 
@@ -68,8 +67,9 @@ async function handleCrossSpaceTask() {
     if (redeemLen > 0) {
 
         let summary = await dxCfxBridge.poolSummary();
-        // 查看是否有, 直接处理
-        if (summary.unlounlockedcked > 0) {
+
+        // 如果有可以去withdraw的就去处理
+        if (summary.unlocked > 0) {
             await _handleRedeem();
             summary = await dxCfxBridge.poolSummary();
         }
@@ -91,8 +91,8 @@ async function handleCrossSpaceTask() {
         }
 
     } else {
-
         let summary = await dxCfxBridge.poolSummary();
+
         if (summary.unlocked > 0) {
             await _handleRedeem(); // withdraw
             summary = await dxCfxBridge.poolSummary();
@@ -124,11 +124,19 @@ async function handleCrossSpaceTask() {
     const stakeAbleBalance = await dxCfxBridge.stakeAbleBalance();
     console.log("stakeAbleBalance : ", stakeAbleBalance);
     if (stakeAbleBalance > ONE_VOTE_CFX) {
+        console.log("11111")
+    } else {
+        console.log("no staking")
+    }
+    /*
+    if (stakeAbleBalance > ONE_VOTE_CFX) {
         const receipt = await dxCfxBridge.stakeVotes().sendTransaction({
             from: cfxAccount.address,
         }).executed();
         logReceipt(receipt, "stake votes");
     }
+
+     */
 }
 
 async function _handleRedeem() {

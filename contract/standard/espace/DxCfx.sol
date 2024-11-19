@@ -3051,7 +3051,7 @@ contract DxCFX is ERC20PresetMinterPauserUpgradeable {
         totalStake += delta;
     }
 
-    // ======================== admin methods =====================
+    // ======================== only admin methods =====================
     function setCoreBridge(address bridge) public onlyRole(TOKEN_ADMIN_ROLE) {
         coreBridge = bridge;
     }

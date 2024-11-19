@@ -16,13 +16,20 @@ const oracle = cfxInstance.Contract({
 
 // posAddress即validator的地址, powAddress地址即core Space合约地址
 async function main() {
-    setInterval(async function () {
-        await updatePosRewardInfo();
-    }, 1000 * 60 * 15.5);
 
     setInterval(async function () {
-        await updatePosAccountInfo();
-    }, 1000 * 60 * 13.5);
+        await updatePosRewardInfo();
+    }, 1000 * 60 * 1);
+
+    setInterval(async function() {
+        await updateUserVotes();
+    }, 1000 * 60 * 13.5)
+
+    /*
+        setInterval(async function () {
+            await updatePosAccountInfo();
+        }, 1000 * 60 * 13.5);
+     */
 
     console.log("=== start pos oracle service ===");
 }
@@ -33,16 +40,14 @@ async function updatePosRewardInfo(epoch) {
             const status = await cfxInstance.pos.getStatus();
             epoch = status.epoch - 1;
         }
-
         console.log(`Updating epoch ${epoch} reward info`);
-
         const rewardInfo = await cfxInstance.pos.getRewardsByEpoch(epoch);
         if (!rewardInfo || !rewardInfo.accountRewards) return;
         const {accountRewards} = rewardInfo;
 
         console.log("account reward info : ", accountRewards)
 
-        // 即比较Core Space地址与powAddress地址是否相同
+        // 即比较 Core Space地址 与 powAddress 地址是否相同
         let target = accountRewards.find(
             (r) =>
                 r.powAddress.toLowerCase() ===
@@ -106,10 +111,30 @@ async function updatePosAccountInfo() {
                 from: cfxAccount.address,
             })
             .executed();
-
         console.log(new Date(), "success updatePosAccountInfo, tx hash is : ", receipt.transactionHash); // log success update transaction hash
     } catch (e) {
         console.error(new Date(), "fail updatePosAccountInfo, error is : ", e);
+    }
+}
+
+async function updateUserVotes() {
+    try {
+        const status = await conflux.pos.getStatus();
+        const accountInfo = await conflux.pos.getAccount(POS_POOL_POS_ACCOUNT);
+        if (!accountInfo) return;
+        const {
+            status: { availableVotes },
+        } = accountInfo;
+        const receipt = await oracle
+            .updateUserVotes(status.epoch, POS_POOL, availableVotes)
+            .sendTransaction({
+                from: account.address,
+            })
+            .executed();
+
+        console.log(new Date(), "updateUserVotes:", receipt.outcomeStatus); // OP log
+    } catch (e) {
+        console.error("updateUserVotes failed", e);
     }
 }
 

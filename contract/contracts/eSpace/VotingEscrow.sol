@@ -32,13 +32,13 @@ contract EVotingEscrow is Ownable, Initializable {
 
     // The core space chain info oracle contract, which's data is maintained by Conflux Team
     ICoreSpaceInfo public coreSpaceInfo;
-    // 
+
     IPoSPool public posPool;
-    //
+
     uint256 public lastUnlockBlock;
     // unlock block => amount (user total lock amount)
     mapping(uint256 => uint256) public globalLockAmount;
-    //
+
     mapping(address => LockInfo) private _userLockInfo;
     // round => user => topic => votes
     mapping(uint64 => mapping(address => mapping(uint16 => uint256[3]))) private userVoteInfo;
@@ -48,7 +48,6 @@ contract EVotingEscrow is Ownable, Initializable {
     mapping(uint64 => mapping(address => mapping(uint16 => VoteMeta))) private userVoteMeta;
     // round => topic => users
     mapping(uint64 => mapping(uint16 => EnumerableSet.AddressSet)) private topicSpecialVoters; // voters who's vote power maybe will change at round end block
-    //
 
     function initialize() public initializer {}
 

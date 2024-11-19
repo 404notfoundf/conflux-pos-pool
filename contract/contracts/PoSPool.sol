@@ -76,7 +76,7 @@ abstract contract Ownable is Context {
   }
 
   /**
-   * @dev Throws if called by any account other than the owner.
+   * @dev Throws if called by any account standard than the owner.
      */
   modifier onlyOwner() {
     _checkOwner();
@@ -1595,7 +1595,6 @@ contract PoSPool is PoolContext, Ownable, Initializable {
   }
 
   // ======================== Contract methods =========================
-
   ///
   /// @notice Increase PoS vote power
   /// @param votePower The number of vote power to increase
@@ -1684,7 +1683,7 @@ contract PoSPool is PoolContext, Ownable, Initializable {
 
   ///
   /// @notice User's reward from participate PoS
-  /// @param depositor The address of user to query
+  /// @param depositor The address of depositor to query
   /// @return CFX reward in Drip
   ///
   function getUserReward(address depositor) public view returns(uint256) {
@@ -1692,14 +1691,14 @@ contract PoSPool is PoolContext, Ownable, Initializable {
 
     uint256 latestAccRewardPerCfx = accRewardPerCfx;
     uint256 latestPoolReward = _selfBalance() - lastPoolShot.balance;
-    UserShot memory uShot = lastUserShots[depositor];
+    UserShot memory userShot = lastUserShots[depositor];
     if (latestPoolReward > 0) {
       uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
       latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
     }
 
-    if (uShot.available > 0) {
-      uint256 latestReward = latestAccRewardPerCfx.sub(uShot.accRewardPerCfx).mul(uShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+    if (userShot.available > 0) {
+      uint256 latestReward = latestAccRewardPerCfx.sub(userShot.accRewardPerCfx).mul(userShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
       currentReward = currentReward.add(_calUserShare(latestReward, depositor));
     }
     return currentReward;
@@ -1715,14 +1714,14 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     uint256 claimedRewards = _userSummaries[depositor].claimedReward;
     uint256 latestAccRewardPerCfx = accRewardPerCfx;
     uint256 latestPoolReward = _selfBalance() - lastPoolShot.balance;
-    UserShot memory uShot = lastUserShots[depositor];
+    UserShot memory userShot = lastUserShots[depositor];
     if (latestPoolReward > 0) {
       uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
       latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
     }
 
-    if (uShot.available > 0) {
-      uint256 latestReward = latestAccRewardPerCfx.sub(uShot.accRewardPerCfx).mul(uShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+    if (userShot.available > 0) {
+      uint256 latestReward = latestAccRewardPerCfx.sub(userShot.accRewardPerCfx).mul(userShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
       currentRewards = currentRewards.add(_calUserShare(latestReward, depositor));
     }
 

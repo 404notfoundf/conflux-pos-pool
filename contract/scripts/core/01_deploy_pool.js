@@ -21,22 +21,22 @@ async function main() {
     const posPoolProxyAddr = poolProxyDeployReceipt.contractCreated;
     console.log("=== pos pool proxy address === : ", posPoolProxyAddr);
 
-    /*
+
     // register pool for test 暂时不需要
     const registerPoolReceipt = await conflux.cfx
         .sendTransaction({
             from: deployer.address,
             value: Drip.fromCFX(1000),
             to: poolAddress,
-            data: process.env.POS_REGIST_DATA,
+            data: process.env.POS_REGISTER_DATA,
         })
         .executed();
     logReceipt(registerPoolReceipt, 'PoSPool registration');
-     */
+
 
     // set pool name to core space pos pool
     const posPool = await conflux.getContractAt('PoSPool', posPoolProxyAddr);
-    const setPoolNameReceipt = await posPool.setPoolName('test_A').sendTransaction({
+    const setPoolNameReceipt = await posPool.setPoolName('Dxpool CFX').sendTransaction({
         from: deployer.address,
     }).executed();
     logReceipt(setPoolNameReceipt, 'PosPool set name');

@@ -15,13 +15,16 @@
    ```shell
       npx hardhat run scripts/core/01_deploy_pool.js --network cfx_testnet
    ```
+   
+   将部署后的合约地址填入 env 文件中 POS_POOL 字段
 
-   4. 将部署后的合约地址填入 env 文件中 POOL_ADDRESS 字段
-
-   5. 部署 VotingEscrow 合约
+   4. 部署 VotingEscrow 合约
    ```shell
       npx hardhat run scripts/core/02_deploy_votingEscrow.js --network cfx_testnet
    ```   
+  
+   部署后的 VotingEscrow合约 填入 VOTING_ESCROW 字段
+
 (注：主网部署需要将配置文件中 CFX_RPC_URL, NETWORK_ID 替换成主网, 同时部署命令中将 cfx_testnet 替换成 cfx 即可)
 
 3. 需要手动验证合约, 且不支持多个文件拆分
@@ -32,7 +35,7 @@
 ```shell
    npx hardhat run scripts/core/03_deploy_posOracle.js --network cfx_testnet
 ```
-将部署后的合约地址填入 env 文件中 POS_ORACLE
+将部署后的合约地址填入 env 文件中 POS_ORACLE 字段
 
 与此同时, 我们需要开启相应的服务来更新PoSOracle合约
 - 开启对应服务，更新PoSOracle合约
