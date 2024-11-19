@@ -1,5 +1,5 @@
 const { conflux } = require('hardhat');
-const { logReceipt } = require('../core/conflux.js');
+const { logReceipt } = require('../deploy/conflux.js');
 
 
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
     const upgradeReceipt =  await posPoolProxy.upgradeTo(posPoolImplAddr).sendTransaction({
         from: deployer.address,
     }).executed();
-    logReceipt(upgradeReceipt, 'PosPool upgrade');
+    logReceipt(upgradeReceipt, "pos pool upgrade");
 }
 
 

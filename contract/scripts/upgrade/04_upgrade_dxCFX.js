@@ -3,7 +3,7 @@ const { ethers} = require('hardhat');
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    // deploy DxCFX contract
+    // deploy DxCFX impl contract
     const dxCFXFactory = await ethers.getContractFactory('DxCFX');
     const dxCFXImpl = await dxCFXFactory.connect(deployer).deploy();
     await dxCFXImpl.deployed();
@@ -12,10 +12,9 @@ async function main() {
     // upgrade DxCFX contract
     const DxCFX = await ethers.getContractAt('PoSPoolProxy1967', process.env.ESPACE_POOL);
     DxCFX.connect(deployer).upgradeTo(dxCFXImpl.address);
-    console.log("upgrade DxCFX finished !!!");
+    console.log("upgrade DxCFX");
 
 }
-//
 
 main().catch((error) => {
     console.error(error);

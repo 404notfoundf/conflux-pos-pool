@@ -1,5 +1,5 @@
 const { conflux } = require('hardhat');
-const { logReceipt } = require('../core/conflux.js');
+const { logReceipt } = require('../deploy/conflux.js');
 
 async function main(){
     const [deployer] = await conflux.getSigners();
