@@ -1,6 +1,4 @@
 const { conflux } = require('hardhat');
-const { InitializeMethodData } = require('../../utils/index.js');
-
 const {format} = require('js-conflux-sdk');
 
 async function main() {
@@ -15,7 +13,7 @@ async function main() {
     }).executed();
 
     const DxCFXBridgeImplAddress = DxCFXBridgeDeployReceipt.contractCreated;
-    console.log("=== cfx bridge impl address === : ", DxCFXBridgeImplAddress);
+    console.log("=== cfx bridge logic address === : ", DxCFXBridgeImplAddress);
 
     // deploy DxCFXBridge proxy Contract
     const DxCFXBridgeProxy = await conflux.getContractFactory('PoSPoolProxy1967');

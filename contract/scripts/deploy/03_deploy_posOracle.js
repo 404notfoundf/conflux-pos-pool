@@ -1,9 +1,5 @@
 const { conflux } = require('hardhat');
-const { logReceipt } = require('./conflux.js');
-const { InitializeMethodData } = require('../../utils/index.js');
 const {format} = require('js-conflux-sdk');
-
-const operatorAddress= "cfxtest:aake54vmfm58n8kzkb5y3302uj1mw1z2duh2w5zaw4"
 
 async function main() {
     const [deployer] = await conflux.getSigners();

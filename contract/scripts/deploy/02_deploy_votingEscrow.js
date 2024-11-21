@@ -11,7 +11,7 @@ async function main() {
         from: deployer.address,
     }).executed();
     const votingEscrowImplAddress = votingEscrowDeployReceipt.contractCreated;
-    console.log("=== votingEscrow impl address === : ", votingEscrowImplAddress);
+    console.log("=== votingEscrow logic address === : ", votingEscrowImplAddress);
 
     // deploy votingEscrow proxy contract
     const PoSPoolProxy = await conflux.getContractFactory('PoSPoolProxy1967');

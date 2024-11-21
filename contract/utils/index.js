@@ -23,7 +23,7 @@ function loadESpacePrivateKey() {
 // proxy1967 initialize(no params) method data
 const InitializeMethodData = '0x8129fc1c';
 
-// 关于CoreSpace
+// 关于 CoreSpace
 const cfxInstance = new Conflux({
     url: process.env.CFX_RPC_URL,
     networkId: parseInt(process.env.CFX_NETWORK_ID)
@@ -31,8 +31,7 @@ const cfxInstance = new Conflux({
 
 const cfxAccount = cfxInstance.wallet.addPrivateKey(loadPrivateKey())
 
-
-// 关于eSpace
+// 关于 eSpace
 const eSpaceInstance = new Conflux({
     url: process.env.ESPACE_RPC_URL,
     networkId: parseInt(process.env.ESPACE_NETWORK_ID)

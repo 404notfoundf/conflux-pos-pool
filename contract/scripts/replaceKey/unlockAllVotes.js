@@ -1,6 +1,6 @@
 require("dotenv").config();
-const {conflux, Drip, account, logReceipt} = require("../conflux");
-const poolContractInfo = require("../../artifacts/contracts/PoSPool.sol/PoSPool.json");
+const {conflux, account, logReceipt} = require("../deploy/conflux");
+const poolContractInfo = require("../../artifacts/contracts/cspace/PoSPool.sol//PoSPool.json");
 
 const poolContract = conflux.Contract({
     abi: poolContractInfo.abi,

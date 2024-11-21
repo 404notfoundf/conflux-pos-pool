@@ -13,10 +13,10 @@ const ESPACE_PRIVATE_KEY = loadESpacePrivateKey();
 task("upgradeContract", "Upgrade a Proxy1967 Contract, assumes the implementation contract has no constructor parameters")
     .addParam("address", "The address of the proxy contract")
     .addParam("contract", "The name of the implementation contract")
-    .setAction(async (taskArguments, hre, runSuper) => {
+    .setAction(async (taskArguments, hre) => {
         const address = taskArguments.address;
         const name = taskArguments.contract;
-        let implAddress = "";
+        let implAddress;
 
         if (address.toLowerCase().startsWith("cfx")) {
             const [deployer] = await hre.conflux.getSigners();
@@ -38,7 +38,6 @@ task("upgradeContract", "Upgrade a Proxy1967 Contract, assumes the implementatio
             const Contract = await hre.ethers.getContractFactory(name);
             const contract = await Contract.deploy();
             await contract.deployed();
-            implAddress = contract.address;
 
             console.log(`New ${name} impl deployed to ${contract.address}`);
 
@@ -52,7 +51,7 @@ task("upgradeContract", "Upgrade a Proxy1967 Contract, assumes the implementatio
 task("upgradeToNewImpl", "Upgrade a Proxy1967 Contract to new implementation, assumes the implementation contract has no constructor parameters")
     .addParam("address", "The address of the proxy contract")
     .addParam("impl", "The address of new implementation")
-    .setAction(async (taskArguments, hre, runSuper) => {
+    .setAction(async (taskArguments, hre) => {
         const address = taskArguments.address;
         const implAddress = taskArguments.impl;
 

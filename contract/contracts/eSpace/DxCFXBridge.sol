@@ -771,16 +771,16 @@ contract DxCFXBridge is Ownable, Initializable {
     }
 
     function unstakeVotes(uint64 votes) public onlyOperator {
-        IPoSPool.UserSummary memory poolSummary = poolSummary();
-        require(poolSummary.locked >= votes, "DxCFXBridge: insufficient votes");
+        IPoSPool.UserSummary memory summary = poolSummary();
+        require(summary.locked >= votes, "DxCFXBridge: insufficient votes");
         posPoolInterface.decreaseStake(votes);
     }
 
     function handleRedeem() public onlyOperator {
         // withdraw unlocked votes
-        IPoSPool.UserSummary memory poolSummary = poolSummary();
-        if (poolSummary.unlocked > 0) {
-            posPoolInterface.withdrawStake(uint64(poolSummary.unlocked));
+        IPoSPool.UserSummary memory summary = poolSummary();
+        if (summary.unlocked > 0) {
+            posPoolInterface.withdrawStake(uint64(summary.unlocked));
         }
 
         // use current balance handle redeem request
@@ -793,21 +793,21 @@ contract DxCFXBridge is Ownable, Initializable {
             if (!handled) break;
         }
 
-        if (poolSummary.locked == 0) return;
+        if (summary.locked == 0) return;
 
         uint256 totalRedeemed = eSpacePoolTotalRedeemed();
 
         if (totalRedeemed == 0) return;
 
         // use total redeemed amount minus current unlocking votes, calculate need unstake votes
-        uint256 unlocking = poolSummary.votes - poolSummary.available - poolSummary.unlocked;
+        uint256 unlocking = summary.votes - summary.available - summary.unlocked;
         if (unlocking * CFX_PER_VOTE + _balance() >= totalRedeemed) return;
 
         uint256 needUnstake = (totalRedeemed - unlocking * CFX_PER_VOTE) / CFX_PER_VOTE;
 
         if (totalRedeemed % CFX_PER_VOTE > 0) needUnstake += 1;
 
-        if (needUnstake > poolSummary.locked) needUnstake = poolSummary.locked;
+        if (needUnstake > summary.locked) needUnstake = summary.locked;
 
         posPoolInterface.decreaseStake(uint64(needUnstake));
     }
@@ -863,13 +863,13 @@ contract DxCFXBridge is Ownable, Initializable {
         for (uint256 i = 1; i <= aprPeriodCount; i++) {
             uint256 epoch = posEpoch - i;
 
-            uint256 poolReward = posOracle.getUserPoSReward(epoch, posPoolAddr);
-            uint256 poolVotes = posOracle.getUserVotes(epoch, posPoolAddr);
+            uint256 reward = posOracle.getUserPoSReward(epoch, posPoolAddr);
+            uint256 votes = posOracle.getUserVotes(epoch, posPoolAddr);
 
-            if (poolVotes == 0) continue;
+            if (votes == 0) continue;
 
-            totalVotes += poolVotes;
-            totalReward += poolReward;
+            totalVotes += votes;
+            totalReward += reward;
         }
 
         if (totalReward == 0 || totalVotes == 0) return 0;
