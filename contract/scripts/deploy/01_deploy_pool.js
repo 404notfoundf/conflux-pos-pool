@@ -11,6 +11,7 @@ async function main() {
         from: deployer.address,
     }).executed();
     const posPoolImplAddress = poolDeployReceipt.contractCreated;
+
     console.log("=== pos pool impl address === : ", posPoolImplAddress);
 
     // deploy core space pos pool proxy contract
