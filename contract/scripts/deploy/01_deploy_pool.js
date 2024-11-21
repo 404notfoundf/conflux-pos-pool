@@ -12,7 +12,7 @@ async function main() {
     }).executed();
     const posPoolImplAddress = poolDeployReceipt.contractCreated;
 
-    console.log("=== pos pool impl address === : ", posPoolImplAddress);
+    console.log("=== pos pool logic address === : ", posPoolImplAddress);
 
     // deploy core space pos pool proxy contract
     const poSPoolProxy = await conflux.getContractFactory('PoSPoolProxy1967');

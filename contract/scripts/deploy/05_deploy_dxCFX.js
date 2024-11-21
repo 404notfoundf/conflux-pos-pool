@@ -9,7 +9,7 @@ async function main() {
     const dxCFXFactory = await ethers.getContractFactory('DxCFX');
     const dxCFXImpl = await dxCFXFactory.connect(deployer).deploy();
     await dxCFXImpl.deployed();
-    console.log("=== DxCFX Token impl address === : ", dxCFXImpl.address);
+    console.log("=== DxCFX Token logic address === : ", dxCFXImpl.address);
 
     // deploy DxCFX proxy contract
     const dxCFXProxyFactory = await ethers.getContractFactory('PoSPoolProxy1967');

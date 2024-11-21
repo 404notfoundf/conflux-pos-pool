@@ -24,7 +24,7 @@
    ```
 
 ### 部署 Core Space 相关合约
-1. 填入.env文件中 PRIVATE_KEY, POS_REGISTER_DATA 字段
+1. 填入.env文件中 PRIVATE_KEY, ESPACE_PRIVATE_KEY, POS_REGISTER_DATA 字段
 
 **注: 如果是主网部署的话, 将部署命令中的 cfx_testnet 替换成 cfx , espace_testnet 替换成 espace 即可**
 
@@ -39,7 +39,6 @@
       npx hardhat run scripts/deploy/02_deploy_votingEscrow.js --network cfx_testnet
    ```
    将部署后的合约地址填入 .env文件中 VOTING_ESCROW 字段
-
 
 ### 部署 ESpace 小额质押相关合约
 需要先部署Core Space相关合约, 填入 .env文件中的 POS_POOL, VOTING_ESCROW 字段

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const {conflux, Drip, account, logReceipt} = require("../conflux");
+const {conflux, account, logReceipt} = require("../deploy/conflux");
 const poolContractInfo = require("../../artifacts/contracts/cspace/PoSPool.sol/PoSPool.json");
 
 const poolContract = conflux.Contract({
@@ -9,10 +9,10 @@ const poolContract = conflux.Contract({
 
 async function main() {
     const len = await poolContract.stakerNumber();
-    console.log('Staker number', len);
+    console.log('stake number', len);
     
-    let allunLocked = await isAllVotesUnLocked(len);
-    if (!allunLocked) {
+    let allUnLocked = await isAllVotesUnLocked(len);
+    if (!allUnLocked) {
         console.log("Not all votes are unlocked, can't restake");
         return;
     }
