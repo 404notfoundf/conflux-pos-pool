@@ -1,7 +1,5 @@
 //SPDX-License-Identifier: MIT
-
 // File: @openzeppelin/contracts/utils/Context.sol
-
 // OpenZeppelin Contracts (last updated v5.0.1) (utils/Context.sol)
 
 pragma solidity ^0.8.20;
@@ -76,7 +74,7 @@ abstract contract Ownable is Context {
   }
 
   /**
-   * @dev Throws if called by any account standard than the owner.
+   * @dev Throws if called by any account other than the owner.
      */
   modifier onlyOwner() {
     _checkOwner();
@@ -129,6 +127,113 @@ abstract contract Ownable is Context {
     address oldOwner = _owner;
     _owner = newOwner;
     emit OwnershipTransferred(oldOwner, newOwner);
+  }
+}
+
+// File: @openzeppelin/contracts/security/Pausable.sol
+
+
+// OpenZeppelin Contracts (last updated v4.7.0) (security/Pausable.sol)
+
+pragma solidity ^0.8.0;
+
+
+/**
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
+ */
+abstract contract Pausable is Context {
+  /**
+   * @dev Emitted when the pause is triggered by `account`.
+     */
+  event Paused(address account);
+
+  /**
+   * @dev Emitted when the pause is lifted by `account`.
+     */
+  event Unpaused(address account);
+
+  bool private _paused;
+
+  /**
+   * @dev Initializes the contract in unpaused state.
+     */
+  constructor() {
+    _paused = false;
+  }
+
+  /**
+   * @dev Modifier to make a function callable only when the contract is not paused.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+  modifier whenNotPaused() {
+    _requireNotPaused();
+    _;
+  }
+
+  /**
+   * @dev Modifier to make a function callable only when the contract is paused.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+  modifier whenPaused() {
+    _requirePaused();
+    _;
+  }
+
+  /**
+   * @dev Returns true if the contract is paused, and false otherwise.
+     */
+  function paused() public view virtual returns (bool) {
+    return _paused;
+  }
+
+  /**
+   * @dev Throws if the contract is paused.
+     */
+  function _requireNotPaused() internal view virtual {
+    require(!paused(), "Pausable: paused");
+  }
+
+  /**
+   * @dev Throws if the contract is not paused.
+     */
+  function _requirePaused() internal view virtual {
+    require(paused(), "Pausable: not paused");
+  }
+
+  /**
+   * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+  function _pause() internal virtual whenNotPaused {
+    _paused = true;
+    emit Paused(_msgSender());
+  }
+
+  /**
+   * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+  function _unpause() internal virtual whenPaused {
+    _paused = false;
+    emit Unpaused(_msgSender());
   }
 }
 
@@ -346,6 +451,237 @@ library SafeMath {
     unchecked {
       require(b > 0, errorMessage);
       return a % b;
+    }
+  }
+}
+
+// File: @openzeppelin/contracts/proxy/utils/Initializable.sol
+
+
+// OpenZeppelin Contracts (last updated v5.0.0) (proxy/utils/Initializable.sol)
+
+pragma solidity ^0.8.20;
+
+/**
+ * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
+ * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an
+ * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
+ * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.
+ *
+ * The initialization functions use a version number. Once a version number is used, it is consumed and cannot be
+ * reused. This mechanism prevents re-execution of each "step" but allows the creation of new initialization steps in
+ * case an upgrade adds a module that needs to be initialized.
+ *
+ * For example:
+ *
+ * [.hljs-theme-light.nopadding]
+ * ```solidity
+ * contract MyToken is ERC20Upgradeable {
+ *     function initialize() initializer public {
+ *         __ERC20_init("MyToken", "MTK");
+ *     }
+ * }
+ *
+ * contract MyTokenV2 is MyToken, ERC20PermitUpgradeable {
+ *     function initializeV2() reinitializer(2) public {
+ *         __ERC20Permit_init("MyToken");
+ *     }
+ * }
+ * ```
+ *
+ * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as
+ * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.
+ *
+ * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure
+ * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
+ *
+ * [CAUTION]
+ * ====
+ * Avoid leaving a contract uninitialized.
+ *
+ * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation
+ * contract, which may impact the proxy. To prevent the implementation contract from being used, you should invoke
+ * the {_disableInitializers} function in the constructor to automatically lock it when it is deployed:
+ *
+ * [.hljs-theme-light.nopadding]
+ * ```
+ * /// @custom:oz-upgrades-unsafe-allow constructor
+ * constructor() {
+ *     _disableInitializers();
+ * }
+ * ```
+ * ====
+ */
+abstract contract Initializable {
+  /**
+   * @dev Storage of the initializable contract.
+     *
+     * It's implemented on a custom ERC-7201 namespace to reduce the risk of storage collisions
+     * when using with upgradeable contracts.
+     *
+     * @custom:storage-location erc7201:openzeppelin.storage.Initializable
+     */
+  struct InitializableStorage {
+    /**
+     * @dev Indicates that the contract has been initialized.
+         */
+    uint64 _initialized;
+    /**
+     * @dev Indicates that the contract is in the process of being initialized.
+         */
+    bool _initializing;
+  }
+
+  // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.Initializable")) - 1)) & ~bytes32(uint256(0xff))
+  bytes32 private constant INITIALIZABLE_STORAGE = 0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00;
+
+  /**
+   * @dev The contract is already initialized.
+     */
+  error InvalidInitialization();
+
+  /**
+   * @dev The contract is not initializing.
+     */
+  error NotInitializing();
+
+  /**
+   * @dev Triggered when the contract has been initialized or reinitialized.
+     */
+  event Initialized(uint64 version);
+
+  /**
+   * @dev A modifier that defines a protected initializer function that can be invoked at most once. In its scope,
+     * `onlyInitializing` functions can be used to initialize parent contracts.
+     *
+     * Similar to `reinitializer(1)`, except that in the context of a constructor an `initializer` may be invoked any
+     * number of times. This behavior in the constructor can be useful during testing and is not expected to be used in
+     * production.
+     *
+     * Emits an {Initialized} event.
+     */
+  modifier initializer() {
+    // solhint-disable-next-line var-name-mixedcase
+    InitializableStorage storage $ = _getInitializableStorage();
+
+    // Cache values to avoid duplicated sloads
+    bool isTopLevelCall = !$._initializing;
+    uint64 initialized = $._initialized;
+
+    // Allowed calls:
+    // - initialSetup: the contract is not in the initializing state and no previous version was
+    //                 initialized
+    // - construction: the contract is initialized at version 1 (no reininitialization) and the
+    //                 current contract is just being deployed
+    bool initialSetup = initialized == 0 && isTopLevelCall;
+    bool construction = initialized == 1 && address(this).code.length == 0;
+
+    if (!initialSetup && !construction) {
+      revert InvalidInitialization();
+    }
+    $._initialized = 1;
+    if (isTopLevelCall) {
+      $._initializing = true;
+    }
+    _;
+    if (isTopLevelCall) {
+      $._initializing = false;
+      emit Initialized(1);
+    }
+  }
+
+  /**
+   * @dev A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the
+     * contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be
+     * used to initialize parent contracts.
+     *
+     * A reinitializer may be used after the original initialization step. This is essential to configure modules that
+     * are added through upgrades and that require initialization.
+     *
+     * When `version` is 1, this modifier is similar to `initializer`, except that functions marked with `reinitializer`
+     * cannot be nested. If one is invoked in the context of another, execution will revert.
+     *
+     * Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in
+     * a contract, executing them in the right order is up to the developer or operator.
+     *
+     * WARNING: Setting the version to 2**64 - 1 will prevent any future reinitialization.
+     *
+     * Emits an {Initialized} event.
+     */
+  modifier reinitializer(uint64 version) {
+    // solhint-disable-next-line var-name-mixedcase
+    InitializableStorage storage $ = _getInitializableStorage();
+
+    if ($._initializing || $._initialized >= version) {
+      revert InvalidInitialization();
+    }
+    $._initialized = version;
+    $._initializing = true;
+    _;
+    $._initializing = false;
+    emit Initialized(version);
+  }
+
+  /**
+   * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
+     * {initializer} and {reinitializer} modifiers, directly or indirectly.
+     */
+  modifier onlyInitializing() {
+    _checkInitializing();
+    _;
+  }
+
+  /**
+   * @dev Reverts if the contract is not in an initializing state. See {onlyInitializing}.
+     */
+  function _checkInitializing() internal view virtual {
+    if (!_isInitializing()) {
+      revert NotInitializing();
+    }
+  }
+
+  /**
+   * @dev Locks the contract, preventing any future reinitialization. This cannot be part of an initializer call.
+     * Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized
+     * to any version. It is recommended to use this to lock implementation contracts that are designed to be called
+     * through proxies.
+     *
+     * Emits an {Initialized} event the first time it is successfully executed.
+     */
+  function _disableInitializers() internal virtual {
+    // solhint-disable-next-line var-name-mixedcase
+    InitializableStorage storage $ = _getInitializableStorage();
+
+    if ($._initializing) {
+      revert InvalidInitialization();
+    }
+    if ($._initialized != type(uint64).max) {
+      $._initialized = type(uint64).max;
+      emit Initialized(type(uint64).max);
+    }
+  }
+
+  /**
+   * @dev Returns the highest version that has been initialized. See {reinitializer}.
+     */
+  function _getInitializedVersion() internal view returns (uint64) {
+    return _getInitializableStorage()._initialized;
+  }
+
+  /**
+   * @dev Returns `true` if the contract is currently initializing. See {onlyInitializing}.
+     */
+  function _isInitializing() internal view returns (bool) {
+    return _getInitializableStorage()._initializing;
+  }
+
+  /**
+   * @dev Returns a pointer to the storage namespace.
+     */
+  // solhint-disable-next-line var-name-mixedcase
+  function _getInitializableStorage() private pure returns (InitializableStorage storage $) {
+    assembly {
+      $.slot := INITIALIZABLE_STORAGE
     }
   }
 }
@@ -728,237 +1064,6 @@ library EnumerableSet {
     }
 
     return result;
-  }
-}
-
-// File: @openzeppelin/contracts/proxy/utils/Initializable.sol
-
-
-// OpenZeppelin Contracts (last updated v5.0.0) (proxy/utils/Initializable.sol)
-
-pragma solidity ^0.8.20;
-
-/**
- * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
- * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an
- * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
- * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.
- *
- * The initialization functions use a version number. Once a version number is used, it is consumed and cannot be
- * reused. This mechanism prevents re-execution of each "step" but allows the creation of new initialization steps in
- * case an upgrade adds a module that needs to be initialized.
- *
- * For example:
- *
- * [.hljs-theme-light.nopadding]
- * ```solidity
- * contract MyToken is ERC20Upgradeable {
- *     function initialize() initializer public {
- *         __ERC20_init("MyToken", "MTK");
- *     }
- * }
- *
- * contract MyTokenV2 is MyToken, ERC20PermitUpgradeable {
- *     function initializeV2() reinitializer(2) public {
- *         __ERC20Permit_init("MyToken");
- *     }
- * }
- * ```
- *
- * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as
- * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.
- *
- * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure
- * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
- *
- * [CAUTION]
- * ====
- * Avoid leaving a contract uninitialized.
- *
- * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation
- * contract, which may impact the proxy. To prevent the implementation contract from being used, you should invoke
- * the {_disableInitializers} function in the constructor to automatically lock it when it is deployed:
- *
- * [.hljs-theme-light.nopadding]
- * ```
- * /// @custom:oz-upgrades-unsafe-allow constructor
- * constructor() {
- *     _disableInitializers();
- * }
- * ```
- * ====
- */
-abstract contract Initializable {
-  /**
-   * @dev Storage of the initializable contract.
-     *
-     * It's implemented on a custom ERC-7201 namespace to reduce the risk of storage collisions
-     * when using with upgradeable contracts.
-     *
-     * @custom:storage-location erc7201:openzeppelin.storage.Initializable
-     */
-  struct InitializableStorage {
-    /**
-     * @dev Indicates that the contract has been initialized.
-         */
-    uint64 _initialized;
-    /**
-     * @dev Indicates that the contract is in the process of being initialized.
-         */
-    bool _initializing;
-  }
-
-  // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.Initializable")) - 1)) & ~bytes32(uint256(0xff))
-  bytes32 private constant INITIALIZABLE_STORAGE = 0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00;
-
-  /**
-   * @dev The contract is already initialized.
-     */
-  error InvalidInitialization();
-
-  /**
-   * @dev The contract is not initializing.
-     */
-  error NotInitializing();
-
-  /**
-   * @dev Triggered when the contract has been initialized or reinitialized.
-     */
-  event Initialized(uint64 version);
-
-  /**
-   * @dev A modifier that defines a protected initializer function that can be invoked at most once. In its scope,
-     * `onlyInitializing` functions can be used to initialize parent contracts.
-     *
-     * Similar to `reinitializer(1)`, except that in the context of a constructor an `initializer` may be invoked any
-     * number of times. This behavior in the constructor can be useful during testing and is not expected to be used in
-     * production.
-     *
-     * Emits an {Initialized} event.
-     */
-  modifier initializer() {
-    // solhint-disable-next-line var-name-mixedcase
-    InitializableStorage storage $ = _getInitializableStorage();
-
-    // Cache values to avoid duplicated sloads
-    bool isTopLevelCall = !$._initializing;
-    uint64 initialized = $._initialized;
-
-    // Allowed calls:
-    // - initialSetup: the contract is not in the initializing state and no previous version was
-    //                 initialized
-    // - construction: the contract is initialized at version 1 (no reininitialization) and the
-    //                 current contract is just being deployed
-    bool initialSetup = initialized == 0 && isTopLevelCall;
-    bool construction = initialized == 1 && address(this).code.length == 0;
-
-    if (!initialSetup && !construction) {
-      revert InvalidInitialization();
-    }
-    $._initialized = 1;
-    if (isTopLevelCall) {
-      $._initializing = true;
-    }
-    _;
-    if (isTopLevelCall) {
-      $._initializing = false;
-      emit Initialized(1);
-    }
-  }
-
-  /**
-   * @dev A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the
-     * contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be
-     * used to initialize parent contracts.
-     *
-     * A reinitializer may be used after the original initialization step. This is essential to configure modules that
-     * are added through upgrades and that require initialization.
-     *
-     * When `version` is 1, this modifier is similar to `initializer`, except that functions marked with `reinitializer`
-     * cannot be nested. If one is invoked in the context of another, execution will revert.
-     *
-     * Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in
-     * a contract, executing them in the right order is up to the developer or operator.
-     *
-     * WARNING: Setting the version to 2**64 - 1 will prevent any future reinitialization.
-     *
-     * Emits an {Initialized} event.
-     */
-  modifier reinitializer(uint64 version) {
-    // solhint-disable-next-line var-name-mixedcase
-    InitializableStorage storage $ = _getInitializableStorage();
-
-    if ($._initializing || $._initialized >= version) {
-      revert InvalidInitialization();
-    }
-    $._initialized = version;
-    $._initializing = true;
-    _;
-    $._initializing = false;
-    emit Initialized(version);
-  }
-
-  /**
-   * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
-     * {initializer} and {reinitializer} modifiers, directly or indirectly.
-     */
-  modifier onlyInitializing() {
-    _checkInitializing();
-    _;
-  }
-
-  /**
-   * @dev Reverts if the contract is not in an initializing state. See {onlyInitializing}.
-     */
-  function _checkInitializing() internal view virtual {
-    if (!_isInitializing()) {
-      revert NotInitializing();
-    }
-  }
-
-  /**
-   * @dev Locks the contract, preventing any future reinitialization. This cannot be part of an initializer call.
-     * Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized
-     * to any version. It is recommended to use this to lock implementation contracts that are designed to be called
-     * through proxies.
-     *
-     * Emits an {Initialized} event the first time it is successfully executed.
-     */
-  function _disableInitializers() internal virtual {
-    // solhint-disable-next-line var-name-mixedcase
-    InitializableStorage storage $ = _getInitializableStorage();
-
-    if ($._initializing) {
-      revert InvalidInitialization();
-    }
-    if ($._initialized != type(uint64).max) {
-      $._initialized = type(uint64).max;
-      emit Initialized(type(uint64).max);
-    }
-  }
-
-  /**
-   * @dev Returns the highest version that has been initialized. See {reinitializer}.
-     */
-  function _getInitializedVersion() internal view returns (uint64) {
-    return _getInitializableStorage()._initialized;
-  }
-
-  /**
-   * @dev Returns `true` if the contract is currently initializing. See {onlyInitializing}.
-     */
-  function _isInitializing() internal view returns (bool) {
-    return _getInitializableStorage()._initializing;
-  }
-
-  /**
-   * @dev Returns a pointer to the storage namespace.
-     */
-  // solhint-disable-next-line var-name-mixedcase
-  function _getInitializableStorage() private pure returns (InitializableStorage storage $) {
-    assembly {
-      $.slot := INITIALIZABLE_STORAGE
-    }
   }
 }
 
@@ -1349,15 +1454,16 @@ interface IVotingEscrow {
   event CastVote(address indexed user, uint256 indexed round, uint256 indexed topicIndex, uint256[3] votes);
 }
 
-// File: contracts/1.test.dxCspace.sol
+// File: contracts/PoSPool.sol
 
 pragma solidity ^0.8.20;
+
 ///
 ///  @title PoSPool
 ///  @dev This is Conflux PoS pool contract
 ///  @notice Users can use this contract to participate Conflux PoS without running a PoS node.
 ///
-contract PoSPool is PoolContext, Ownable, Initializable {
+contract PoSPool is PoolContext, Initializable, Ownable, Pausable {
   using SafeMath for uint256;
   using EnumerableSet for EnumerableSet.AddressSet;
   using VotePowerQueue for VotePowerQueue.InOutQueue;
@@ -1446,7 +1552,7 @@ contract PoSPool is PoolContext, Ownable, Initializable {
 
   // ======================== Modifiers =========================
   modifier onlyRegistered() {
-    require(_poolRegistered, "Pool is not registed");
+    require(_poolRegistered, "Pool is not registered");
     _;
   }
 
@@ -1535,25 +1641,20 @@ contract PoSPool is PoolContext, Ownable, Initializable {
   event RatioUpdated(uint256 ratio);
 
   // ======================== Init methods =========================
+  constructor() Ownable(msg.sender) {}
 
-  constructor() Ownable(msg.sender) {
-  }
-
-  // call this method when depoly the 1967 proxy contract
+  // call this method when deploy the 1967 proxy contract
   function initialize() public initializer {
     RATIO_BASE = 10000;
     CFX_COUNT_OF_ONE_VOTE = 1000;
     CFX_VALUE_OF_ONE_VOTE = 1000 ether;
     ONE_DAY_BLOCK_COUNT = 2 * 3600 * 24;
     ONE_YEAR_BLOCK_COUNT = ONE_DAY_BLOCK_COUNT * 365;
+
+    _poolLockPeriod = ONE_DAY_BLOCK_COUNT * 13 + 3600;
+    _poolUnlockPeriod = ONE_DAY_BLOCK_COUNT * 1 + 3600;
+
     poolUserShareRatio = 9000;
-
-    // ** for test
-    _poolLockPeriod = 60;
-    _poolUnlockPeriod = 60;
-
-    // _poolLockPeriod = ONE_DAY_BLOCK_COUNT * 13 + 3600;
-    // _poolUnlockPeriod = ONE_DAY_BLOCK_COUNT * 1 + 3600;
     paramsControl = ParamsControl(0x0888000000000000000000000000000000000007);
   }
 
@@ -1565,7 +1666,6 @@ contract PoSPool is PoolContext, Ownable, Initializable {
   /// @param blsPubKey The bls public key of PoS node
   /// @param vrfPubKey The vrf public key of PoS node
   /// @param blsPubKeyProof The bls public key proof of PoS node
-  ///
   function register(
     bytes32 identifier,
     uint64 votePower,
@@ -1583,7 +1683,7 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     // update user info
     _userSummaries[msg.sender].votes += votePower;
     _userSummaries[msg.sender].available += votePower;
-    _userSummaries[msg.sender].locked += votePower;  // directly add to admin's locked votes
+    _userSummaries[msg.sender].locked += votePower;  // directly add to admin locked votes
 
     _updateUserShot(msg.sender);
 
@@ -1595,18 +1695,18 @@ contract PoSPool is PoolContext, Ownable, Initializable {
   }
 
   // ======================== Contract methods =========================
+
   ///
   /// @notice Increase PoS vote power
   /// @param votePower The number of vote power to increase
   ///
-  function increaseStake(uint64 votePower) public virtual payable onlyRegistered {
+  function increaseStake(uint64 votePower) public virtual payable onlyRegistered whenNotPaused {
     require(votePower > 0, "Minimal votePower is 1");
-    require(msg.value == votePower * CFX_VALUE_OF_ONE_VOTE, "msg.value should be votePower * 1000 ether");
+    require(msg.value == votePower * CFX_VALUE_OF_ONE_VOTE, "msg.value should be votePower * 1000 CFX");
 
     _stakingDeposit(msg.value);
 
-    // for test
-    // _posRegisterIncreaseStake(votePower);
+    _posRegisterIncreaseStake(votePower);
     emit IncreaseStake(msg.sender, votePower);
 
     _updateAccRewardPerCfx();
@@ -1640,8 +1740,7 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     IVotingEscrow.LockInfo memory lockInfo = IVotingEscrow(votingEscrow).userLockInfo(msg.sender);
     require((_userSummaries[msg.sender].available - votePower) * CFX_VALUE_OF_ONE_VOTE >= lockInfo.amount, "Locked is not enough");
 
-    // for test
-    // _posRegisterRetire(votePower);
+    _posRegisterRetire(votePower);
     emit DecreaseStake(msg.sender, votePower);
 
     _updateAccRewardPerCfx();
@@ -1691,14 +1790,14 @@ contract PoSPool is PoolContext, Ownable, Initializable {
 
     uint256 latestAccRewardPerCfx = accRewardPerCfx;
     uint256 latestPoolReward = _selfBalance() - lastPoolShot.balance;
-    UserShot memory userShot = lastUserShots[depositor];
+    UserShot memory uShot = lastUserShots[depositor];
     if (latestPoolReward > 0) {
-      uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
-      latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
+        uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+        latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
     }
 
-    if (userShot.available > 0) {
-      uint256 latestReward = latestAccRewardPerCfx.sub(userShot.accRewardPerCfx).mul(userShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+    if (uShot.available > 0) {
+      uint256 latestReward = latestAccRewardPerCfx.sub(uShot.accRewardPerCfx).mul(uShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
       currentReward = currentReward.add(_calUserShare(latestReward, depositor));
     }
     return currentReward;
@@ -1706,7 +1805,7 @@ contract PoSPool is PoolContext, Ownable, Initializable {
 
   ///
   /// @notice User's reward from participate PoS
-  /// @param depositor The address of user to query
+  /// @param depositor The address of depositor to query
   /// @return depositor totalRewards, unClaimedRewards, claimedRewards
   ///
   function getUserRewardInfo(address depositor) public view returns (uint256, uint256, uint256) {
@@ -1714,19 +1813,19 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     uint256 claimedRewards = _userSummaries[depositor].claimedReward;
     uint256 latestAccRewardPerCfx = accRewardPerCfx;
     uint256 latestPoolReward = _selfBalance() - lastPoolShot.balance;
-    UserShot memory userShot = lastUserShots[depositor];
+    UserShot memory uShot = lastUserShots[depositor];
     if (latestPoolReward > 0) {
-      uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
-      latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
+        uint256 _deltaAcc = latestPoolReward.div(lastPoolShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+        latestAccRewardPerCfx = latestAccRewardPerCfx.add(_deltaAcc);
     }
 
-    if (userShot.available > 0) {
-      uint256 latestReward = latestAccRewardPerCfx.sub(userShot.accRewardPerCfx).mul(userShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
-      currentRewards = currentRewards.add(_calUserShare(latestReward, depositor));
+    if (uShot.available > 0) {
+        uint256 latestReward = latestAccRewardPerCfx.sub(uShot.accRewardPerCfx).mul(uShot.available.mul(CFX_COUNT_OF_ONE_VOTE));
+        currentRewards = currentRewards.add(_calUserShare(latestReward, depositor));
     }
 
-    uint256 totalRewards = currentRewards + claimedRewards;
-    return (totalRewards, currentRewards, claimedRewards);
+      uint256 totalRewards = currentRewards + claimedRewards;
+      return (totalRewards, currentRewards, claimedRewards);
   }
 
   ///
@@ -1788,20 +1887,20 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     if(_apyNodes.start == _apyNodes.end) return 0;
 
     uint256 totalReward = 0;
-    uint256 totalWorkload = 0;
+    uint256 totalStake = 0;
     for(uint256 i = _apyNodes.start; i < _apyNodes.end; i++) {
       PoolAPY.ApyNode memory node = _apyNodes.items[i];
       totalReward = totalReward.add(node.reward);
-      totalWorkload = totalWorkload.add(node.available.mul(CFX_VALUE_OF_ONE_VOTE).mul(node.endBlock - node.startBlock));
+      totalStake = totalStake.add(node.available.mul(CFX_VALUE_OF_ONE_VOTE).mul(node.endBlock - node.startBlock));
     }
 
     if (_blockNumber() > lastPoolShot.blockNumber) {
       uint256 latestReward = _selfBalance().sub(lastPoolShot.balance);
       totalReward = totalReward.add(latestReward);
-      totalWorkload = totalWorkload.add(lastPoolShot.available.mul(CFX_VALUE_OF_ONE_VOTE).mul(_blockNumber() - lastPoolShot.blockNumber));
+      totalStake = totalStake.add(lastPoolShot.available.mul(CFX_VALUE_OF_ONE_VOTE).mul(_blockNumber() - lastPoolShot.blockNumber));
     }
 
-    return totalReward.mul(RATIO_BASE).mul(ONE_YEAR_BLOCK_COUNT).div(totalWorkload);
+    return totalReward.mul(RATIO_BASE).mul(ONE_YEAR_BLOCK_COUNT).div(totalStake);
   }
 
   ///
@@ -1928,20 +2027,20 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     _updatePoolShot();
   }
 
-  function retireUserStake(address addr, uint64 endBlockNumber) public onlyOwner {
-    uint256 votePower = _userSummaries[addr].available;
+  function retireUserStake(address depositor, uint64 endBlockNumber) public onlyOwner {
+    uint256 votePower = _userSummaries[depositor].available;
     if (votePower == 0) return;
 
     _updateAccRewardPerCfx();
 
-    _updateUserReward(addr);
+    _updateUserReward(depositor);
 
-    _userSummaries[addr].available = 0;
-    _userSummaries[addr].locked = 0;
+    _userSummaries[depositor].available = 0;
+    _userSummaries[depositor].locked = 0;
     // clear user inqueue
-    _userInqueues[addr].clear();
-    _userOutqueues[addr].enqueue(VotePowerQueue.QueueNode(votePower, endBlockNumber));
-    _updateUserShot(addr);
+    _userInqueues[depositor].clear();
+    _userOutqueues[depositor].enqueue(VotePowerQueue.QueueNode(votePower, endBlockNumber));
+    _updateUserShot(depositor);
 
     _poolSummary.available -= votePower;
     _updatePoolShot();
@@ -1951,26 +2050,30 @@ contract PoSPool is PoolContext, Ownable, Initializable {
     _posRegisterIncreaseStake(votes);
   }
 
-  function restakeUserStake(address addr) public onlyOwner {
-    _userSummaries[addr].unlocked += _userOutqueues[addr].collectEndedVotes();
-    uint256 votePower = _userSummaries[addr].unlocked;
+  function restakeUserStake(address depositor) public onlyOwner {
+    _userSummaries[depositor].unlocked += _userOutqueues[depositor].collectEndedVotes();
+    uint256 votePower = _userSummaries[depositor].unlocked;
     require(votePower > 0, "minimal votePower is 1");
 
     _posRegisterIncreaseStake(uint64(votePower));
 
     // put stake info in queue
-    _userInqueues[addr].enqueue(VotePowerQueue.QueueNode(votePower, _blockNumber() + _poolLockPeriod));
-    _userSummaries[addr].available += votePower;
-    _userSummaries[addr].unlocked = 0;
-    _updateUserShot(addr);
+    _userInqueues[depositor].enqueue(VotePowerQueue.QueueNode(votePower, _blockNumber() + _poolLockPeriod));
+    _userSummaries[depositor].available += votePower;
+    _userSummaries[depositor].unlocked = 0;
+    _updateUserShot(depositor);
 
     _poolSummary.available += votePower;
     _updatePoolShot();
   }
 
-  // ** for test
-  function setPoolRegistered(bool isPoolRegistered) public onlyOwner {
-    _poolRegistered = isPoolRegistered;
+  // pause the contract
+  function pauseContract() external onlyOwner {
+    _pause();
   }
 
+  // unpause the contract
+  function unpauseContract() external onlyOwner {
+    _unpause();
+  }
 }

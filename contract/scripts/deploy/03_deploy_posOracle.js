@@ -13,8 +13,8 @@ async function main() {
     const PosOracleDeployReceipt = await PosOracle.constructor(format.hexAddress(process.env.OPERATOR_ADDRESS)).sendTransaction({
         from: deployer.address,
     }).executed();
-    const PosOracleAddr = PosOracleDeployReceipt.contractCreated;
-    console.log("=== pos oracle address === : ", PosOracleAddr);
+    const PosOracleAddress = PosOracleDeployReceipt.contractCreated;
+    console.log("=== pos oracle address === : ", PosOracleAddress);
 }
 
 main().catch((error) => {

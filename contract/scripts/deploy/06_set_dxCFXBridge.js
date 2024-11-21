@@ -29,7 +29,6 @@ async function main() {
         from: deployer.address,
     }).executed();
     logReceipt(addToFeeFreeWhiteList, 'add free whitelist');
-
 }
 
 main().catch((error) => {

@@ -14,17 +14,17 @@ async function main() {
         from: deployer.address,
     }).executed();
 
-    const DxCFXBridgeImplAddr = DxCFXBridgeDeployReceipt.contractCreated;
-    console.log("=== cfx bridge impl address === : ", DxCFXBridgeImplAddr);
+    const DxCFXBridgeImplAddress = DxCFXBridgeDeployReceipt.contractCreated;
+    console.log("=== cfx bridge impl address === : ", DxCFXBridgeImplAddress);
 
     // deploy DxCFXBridge proxy Contract
     const DxCFXBridgeProxy = await conflux.getContractFactory('PoSPoolProxy1967');
-    const ProxyDeployReceipt = await DxCFXBridgeProxy.constructor(DxCFXBridgeImplAddr, bridgeData).sendTransaction({
+    const ProxyDeployReceipt = await DxCFXBridgeProxy.constructor(DxCFXBridgeImplAddress, bridgeData).sendTransaction({
         from: deployer.address,
     }).executed();
 
-    const DxCFXBridgeProxyAddr = ProxyDeployReceipt.contractCreated;
-    console.log("=== cfx bridge proxy address === : ", DxCFXBridgeProxyAddr);
+    const DxCFXBridgeProxyAddress = ProxyDeployReceipt.contractCreated;
+    console.log("=== cfx bridge proxy address === : ", DxCFXBridgeProxyAddress);
 }
 
 main().catch((error) => {

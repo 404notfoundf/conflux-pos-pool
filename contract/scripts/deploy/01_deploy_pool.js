@@ -5,34 +5,39 @@ const { logReceipt,Drip } = require('./conflux.js');
 async function main() {
     const [deployer] = await conflux.getSigners();
 
-    // deploy core space pos pool contract
+    // deploy core space pos pool impl contract
     const poSPool = await conflux.getContractFactory('PoSPool');
     const poolDeployReceipt = await poSPool.constructor().sendTransaction({
         from: deployer.address,
     }).executed();
-    const posPoolImplAddr = poolDeployReceipt.contractCreated;
-    console.log("=== pos pool impl address === : ", posPoolImplAddr);
+    const posPoolImplAddress = poolDeployReceipt.contractCreated;
+    console.log("=== pos pool impl address === : ", posPoolImplAddress);
 
     // deploy core space pos pool proxy contract
     const poSPoolProxy = await conflux.getContractFactory('PoSPoolProxy1967');
-    const poolProxyDeployReceipt = await poSPoolProxy.constructor(posPoolImplAddr, InitializeMethodData).sendTransaction({
+    const poolProxyDeployReceipt = await poSPoolProxy.constructor(posPoolImplAddress, InitializeMethodData).sendTransaction({
         from: deployer.address,
     }).executed();
-    const posPoolProxyAddr = poolProxyDeployReceipt.contractCreated;
-    console.log("=== pos pool proxy address === : ", posPoolProxyAddr);
+    const posPoolProxyAddress = poolProxyDeployReceipt.contractCreated;
+    console.log("=== pos pool proxy address === : ", posPoolProxyAddress);
+
+    // register pool
+    const registerPoolReceipt = await conflux.cfx
+        .sendTransaction({
+            from: deployer.address,
+            value: Drip.fromCFX(1000),
+            to: posPoolProxyAddress,
+            data: process.env.POS_REGISTER_DATA,
+        })
+        .executed();
+    logReceipt(registerPoolReceipt, 'PoSPool registration');
 
     // set pool name to core space pos pool
-    const posPool = await conflux.getContractAt('PoSPool', posPoolProxyAddr);
+    const posPool = await conflux.getContractAt('PoSPool', posPoolProxyAddress);
     const setPoolNameReceipt = await posPool.setPoolName('Dxpool CFX').sendTransaction({
         from: deployer.address,
     }).executed();
     logReceipt(setPoolNameReceipt, 'PosPool set name');
-
-    // ======= for test ========
-    const setPoolRegisterReceipt = await posPool.setPoolRegistered(true).sendTransaction({
-        from: deployer.address,
-    }).executed();
-    logReceipt(setPoolRegisterReceipt, 'PosPool set register')
 }
 
 main().catch((error) => {

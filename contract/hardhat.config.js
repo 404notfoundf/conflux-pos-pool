@@ -77,8 +77,17 @@ task("upgradeToNewImpl", "Upgrade a Proxy1967 Contract to new implementation, as
  * Go to https://hardhat.org/config/ to learn more
  */
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+      version: "0.8.20",
+      settings: {
+          optimizer: {
+              enabled: true,
+              runs: 200,
+          },
+      },
+  },
   defaultNetwork: "espace_testnet",
+
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
@@ -106,21 +115,7 @@ module.exports = {
       url: "https://evmtestnet.confluxrpc.com",
       accounts: [ESPACE_PRIVATE_KEY],
       chainId: 71,
-    },
-    net8888: {
-        url: "http://net8888cfx.confluxrpc.com",
-        accounts: [
-          PRIVATE_KEY,
-        ],
-        chainId: 8888,
-    },
-    net8889: {
-      url: "http://net8889eth.confluxrpc.com",
-      accounts: [
-        PRIVATE_KEY,
-      ],
-      chainId: 8889,
-    },
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

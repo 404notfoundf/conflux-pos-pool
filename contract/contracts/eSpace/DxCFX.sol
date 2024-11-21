@@ -3026,6 +3026,7 @@ contract DxCFX is ERC20PresetMinterPauserUpgradeable {
         if (amount > 0 && to != address(0)) {
             _stakers.add(to);
         }
+        require(!paused(), "The contract is paused");
     }
 
     function _afterTokenTransfer(address from, address, uint256) internal override {

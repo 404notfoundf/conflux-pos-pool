@@ -1,31 +1,33 @@
 ## 部署 Core Space 相关合约
 1. 修改 env 中 CFX_RPC_URL, CFX_NETWORK_ID, PRIVATE_KEY
+
 2. 执行相关指令
    1. 进入contract目录
    ```shell
       cd contract 
    ```
-
-   2. 编译整个合约
+   2. 安装node相关库
+      npm install
+   
+   3. 编译整个合约
    ```shell
       npx hardhat compile
    ```
+   
+ **(注：主网部署需要将配置文件中 CFX_RPC_URL, NETWORK_ID 替换成主网, 同时部署命令中将 cfx_testnet 替换成 cfx , espace_testnet 替换成 espace 即可)** 
 
-   3. 部署core Space PosPool 合约
+   4. 部署core Space PosPool 合约
    ```shell
       npx hardhat run scripts/deploy/01_deploy_pool.js --network cfx_testnet
    ```
-   
    将部署后的合约地址填入 env 文件中 POS_POOL 字段
 
-   4. 部署 VotingEscrow 合约
+   5. 部署 VotingEscrow 合约
    ```shell
       npx hardhat run scripts/deploy/02_deploy_votingEscrow.js --network cfx_testnet
    ```   
   
    部署后的 VotingEscrow合约 填入 VOTING_ESCROW 字段
-
-(注：主网部署需要将配置文件中 CFX_RPC_URL, NETWORK_ID 替换成主网, 同时部署命令中将 cfx_testnet 替换成 cfx 即可)
 
 3. 需要手动验证合约, 且不支持多个文件拆分
 
