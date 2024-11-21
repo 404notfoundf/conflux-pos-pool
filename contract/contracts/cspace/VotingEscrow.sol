@@ -976,7 +976,7 @@ interface IPoSPool {
     function votingEscrow() external view returns (address);
     function userVotePower(address user) external view returns (uint256);
 }
-// File: contracts/1.dxVotingEscrow.sol
+// File: contracts/VotingEscrow.sol
 
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
@@ -1028,11 +1028,9 @@ contract VotingEscrow is Ownable, Initializable, IVotingEscrow {
         _;
     }
 
-
     constructor() Ownable(msg.sender) {}
 
-    function initialize() public initializer {
-    }
+    function initialize() public initializer {}
 
     // admin functions
     function setPosPool(address _posPool) public onlyOwner {
