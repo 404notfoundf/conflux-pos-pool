@@ -46,5 +46,16 @@
     "test": "mocha",
     "docs": "npx solidity-docgen --solc-module solc-0.8",
     "compile": "npx hardhat compile"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conflux-fans/pos-pool-contract.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/conflux-fans/pos-pool-contract/issues"
+  },
+  "homepage": "https://github.com/conflux-fans/pos-pool-contract#readme"
 }

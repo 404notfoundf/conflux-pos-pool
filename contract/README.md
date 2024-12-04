@@ -15,7 +15,7 @@
       cp .env.testnet.example .env
    ```
 3. 安装node库
-    ```shell
+   ```shell
       npm install
    ```
 4. 编译合约
