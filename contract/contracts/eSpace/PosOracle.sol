@@ -276,6 +276,8 @@ contract PoSOracle is Ownable, IPoSOracle {
 
     uint256 public posEpochHeight; // PoS epoch height
     address private _operatorAddress;
+    uint256 public startEpoch;
+    uint256 public endEpoch;
     mapping(bytes32 => IPoSOracle.PoSAccountInfo) private _posAccountCurrentInfos; // posAccount => PoSAccountInfo
     mapping(uint256 => mapping(address => IPoSOracle.RewardInfo)) private _rewardInfos; // epochNumber => (powAccount => RewardInfo)
     mapping(uint256 => mapping(address => uint256)) private _userVoteInfos; // epochNumber => (powAccount => availableVotes)
@@ -289,21 +291,24 @@ contract PoSOracle is Ownable, IPoSOracle {
 
     constructor(address operatorAddress) Ownable(msg.sender) {
         _operatorAddress = operatorAddress;
+        startEpoch = 100;
+        endEpoch = 50;
     }
 
-    /**
-     * @dev update account current, user vote info, pos epoch height
-     * @param account pos address
-     * @param epochNumber pos epoch number
-     * @param blockNumber  pos block number
-     * @param availableVotes available votes
-     * @param unlocked unlocked votes
-     * @param locked locked votes
-     * @param forfeited pos node forfeited votes
-     * @param forceRetired is pos node force retired
-     * @param inQueue node in queue info
-     * @param outQueue node out queue info
-     */
+//    /**
+//     * @dev update account current, user vote info, pos epoch height
+//     * @param account pos address
+//     * @param epochNumber pos epoch number
+//     * @param blockNumber  pos block number
+//     * @param availableVotes available votes
+//     * @param unlocked unlocked votes
+//     * @param locked locked votes
+//     * @param forfeited pos node forfeited votes
+//     * @param forceRetired is pos node force retired
+//     * @param inQueue node in queue info
+//     * @param outQueue node out queue info
+//     */
+    /*
     function updatePoSAccountInfo(
         bytes32 account,
         uint256 epochNumber,
@@ -340,10 +345,14 @@ contract PoSOracle is Ownable, IPoSOracle {
         // update posEpochHeight
         updatePoSEpochHeight(epochNumber);
     }
+*/
 
-    function updateUserVotes(uint256 epoch, address powAddr, uint256 availableVotes) public onlyOperator {
-        _userVoteInfos[epoch][powAddr] = availableVotes;
+    function updateUserVotes(uint256 epoch, address powAddress, uint256 availableVotes) public onlyOperator
+    {
+        _userVoteInfos[epoch][powAddress] = availableVotes;
         updatePoSEpochHeight(epoch);
+
+        clearEpochData(epoch - startEpoch, epoch - endEpoch, powAddress);
     }
 
     function updatePoSRewardInfo(uint256 epoch, address powAddress,  bytes32 posAddress, uint256 reward) public onlyOperator
@@ -351,6 +360,18 @@ contract PoSOracle is Ownable, IPoSOracle {
         _rewardInfos[epoch][powAddress].posAddress = posAddress;
         _rewardInfos[epoch][powAddress].powAddress = powAddress;
         _rewardInfos[epoch][powAddress].reward = reward;
+    }
+
+    function clearEpochData(uint256 startEpoch, uint256 endEpoch, address powAddress) public onlyOperator
+    {
+        for (uint256 i = startEpoch; i <= endEpoch; i++) {
+            if (_userVoteInfos[i][powAddress] != 0) {
+                delete _userVoteInfos[i][powAddress];
+            }
+            if (_rewardInfos[i][powAddress].reward != 0) {
+                delete _rewardInfos[i][powAddress];
+            }
+        }
     }
 
     function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public onlyOperator {
@@ -363,6 +384,14 @@ contract PoSOracle is Ownable, IPoSOracle {
 
     function getPoSAccountInfo(bytes32 posAddr) public view returns (IPoSOracle.PoSAccountInfo memory) {
         return _posAccountCurrentInfos[posAddr];
+    }
+
+    function setStartEpoch(uint256 _startEpoch) public onlyOwner {
+        startEpoch = _startEpoch;
+    }
+
+    function setEndEpoch(uint256 _endEpoch) public onlyOwner {
+        endEpoch = _endEpoch;
     }
 
     /**
