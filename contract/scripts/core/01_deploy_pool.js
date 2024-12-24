@@ -36,7 +36,7 @@ async function main() {
 
     // set pool name to core space pos pool
     const posPool = await conflux.getContractAt('PoSPool', posPoolProxyAddr);
-    const setPoolNameReceipt = await posPool.setPoolName('Dxpool CFX').sendTransaction({
+    const setPoolNameReceipt = await posPool.setPoolName('test').sendTransaction({
         from: deployer.address,
     }).executed();
     logReceipt(setPoolNameReceipt, 'PosPool set name');

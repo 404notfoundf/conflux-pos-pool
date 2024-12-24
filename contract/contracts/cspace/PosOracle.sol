@@ -291,19 +291,20 @@ contract PoSOracle is Ownable, IPoSOracle {
         _operatorAddress = operatorAddress;
     }
 
-    /**
-     * @dev update account current, user vote info, pos epoch height
-     * @param account pos address
-     * @param epochNumber pos epoch number
-     * @param blockNumber  pos block number
-     * @param availableVotes available votes
-     * @param unlocked unlocked votes
-     * @param locked locked votes
-     * @param forfeited pos node forfeited votes
-     * @param forceRetired is pos node force retired
-     * @param inQueue node in queue info
-     * @param outQueue node out queue info
-     */
+//    /**
+//     * @dev update account current, user vote info, pos epoch height
+//     * @param account pos address
+//     * @param epochNumber pos epoch number
+//     * @param blockNumber  pos block number
+//     * @param availableVotes available votes
+//     * @param unlocked unlocked votes
+//     * @param locked locked votes
+//     * @param forfeited pos node forfeited votes
+//     * @param forceRetired is pos node force retired
+//     * @param inQueue node in queue info
+//     * @param outQueue node out queue info
+//     */
+    /*
     function updatePoSAccountInfo(
         bytes32 account,
         uint256 epochNumber,
@@ -340,22 +341,61 @@ contract PoSOracle is Ownable, IPoSOracle {
         // update posEpochHeight
         updatePoSEpochHeight(epochNumber);
     }
-
-    function updateUserVotes(uint256 epoch, address powAddr, uint256 availableVotes) public onlyOperator {
-        _userVoteInfos[epoch][powAddr] = availableVotes;
+*/
+    function updateUserVotes(uint256 epoch, address powAddress, uint256 availableVotes) public {
+        _userVoteInfos[epoch][powAddress] = availableVotes;
         updatePoSEpochHeight(epoch);
+
+        // clear epoch data
+        clearEpochData(epoch - 20, epoch - 10, powAddress);
     }
 
-    function updatePoSRewardInfo(uint256 epoch, address powAddress,  bytes32 posAddress, uint256 reward) public onlyOperator
+    function updatePoSRewardInfo(uint256 epoch, address powAddress,  bytes32 posAddress, uint256 reward) public
     {
         _rewardInfos[epoch][powAddress].posAddress = posAddress;
         _rewardInfos[epoch][powAddress].powAddress = powAddress;
         _rewardInfos[epoch][powAddress].reward = reward;
     }
 
-    function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public onlyOperator {
+    function clearEpochData(uint256 startEpoch, uint256 endEpoch, address powAddress) public {
+        for (uint256 i = startEpoch; i <= endEpoch; i++) {
+            if (_userVoteInfos[i][powAddress] != 0) {
+                delete _userVoteInfos[i][powAddress];
+            }
+            if (_rewardInfos[i][powAddress].reward != 0) {
+                delete _rewardInfos[i][powAddress];
+            }
+        }
+    }
+
+    // for test
+    function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public {
         posEpochHeight = latestPoSEpochHeight;
     }
+
+    function clearAndUpdateVotes(uint256 epoch, address powAddress) public {
+        _userVoteInfos[epoch + 1][powAddress] = 100000;
+        delete _userVoteInfos[epoch][powAddress];
+    }
+
+    function updateVotes(uint256 epoch, address powAddress) public {
+        _userVoteInfos[epoch][powAddress] = 100000;
+    }
+
+    function clearVotes(uint256 epoch, address powAddress) public {
+        delete _userVoteInfos[epoch][powAddress];
+    }
+
+    function clearAndUpdateTwoVotes(uint256 epoch, address powAddress) public {
+        _userVoteInfos[epoch + 1][powAddress] = 100000;
+        _userVoteInfos[epoch + 2][powAddress] = 100001;
+
+        delete _userVoteInfos[epoch][powAddress];
+    }
+
+//    function updatePoSEpochHeight(uint256 latestPoSEpochHeight) public onlyOperator {
+//        posEpochHeight = latestPoSEpochHeight;
+//    }
 
     function setOperatorAddress(address operatorAddress) public onlyOwner {
         _operatorAddress = operatorAddress;
